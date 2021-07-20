@@ -1,0 +1,62 @@
+local a=0
+local b="AWP"
+for _,v in pairs(game.ReplicatedStorage.Weapons:GetChildren())do
+    if v:FindFirstChild("DMG")then
+        if v.DMG.Value>a then
+            a=v.DMG.Value
+            b=v
+        end
+    end
+end
+game.RunService.RenderStepped:Connect(function()
+    if game.Players.LocalPlayer.Status.Team.Value~="Spectator"then
+        if not(game.ReplicatedStorage.wkspc.Status.RoundOver.Value or game.ReplicatedStorage.wkspc.Status.Preparation.Value)then
+            for _,v in pairs(game.Players:GetChildren())do
+                if v.Team~=game.Players.LocalPlayer.Team or game.ReplicatedStorage.wkspc.FFA.Value then
+                    if v.Character and not v.Character:FindFirstChild("ShuckyHAX")and v.Character:FindFirstChild("Spawned")and v~=game.Players.LocalPlayer then
+                        game:GetService("ReplicatedStorage").Events.Burn:FireServer(
+                            {
+                                ["Parent"]=v.Character,
+                                ["CFrame"]=game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                            },
+                            game.ReplicatedStorage.Weapons["Golden Gun"],
+                            .99
+                        )
+                        game:GetService("ReplicatedStorage").Events.Burn:FireServer(
+                            {
+                                ["Parent"]=v.Character,
+                                ["CFrame"]=game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                            },
+                            b,
+                            1
+                        )
+                    end
+                end
+            end
+        elseif game.ReplicatedStorage.wkspc.Status.RoundOver.Value then
+            local a=true
+            for _,v in pairs(game.Players:GetChildren())do
+                if v~=game.Players.LocalPlayer then
+                    if v.Character then
+                        if v.Character and getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Client).gun and not v.Character:FindFirstChild("ShuckyHAX")and v.Character:FindFirstChild("Spawned")and v~=game.Players.LocalPlayer then
+                            if v.Team~=game.Players.LocalPlayer.Team or game.ReplicatedStorage.wkspc.FFA.Value then
+                                if not v.Character.HumanoidRootPart:FindFirstChild("Engulfed")then
+                                    game.ReplicatedStorage.Events.Burn:FireServer(
+                                        v.Character.Head,
+                                        b,
+                                        1,
+                                        v.Character.Head.Position)
+                                    if a then
+                                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=v.Character.HumanoidRootPart.CFrame
+                                        game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
+                                        a=false
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
