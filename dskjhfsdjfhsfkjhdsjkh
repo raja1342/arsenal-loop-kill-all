@@ -1,15 +1,4 @@
-
-if _G.scriptrunning then
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "Error",
-        Text = "RuHub is already running!!! >:(",
-        Duration = 5
-    })
-    return  
-else
-
-    _G.scriptrunning = true
-end
+-- how tf did u deobfuscate prometheus
 
 
 
@@ -208,7 +197,7 @@ shared.activeScript = RunService.Heartbeat:Connect(function()
                     end
 
                     if character and character:FindFirstChild("HumanoidRootPart") and targetChar:FindFirstChild("HumanoidRootPart") then
-                        character.HumanoidRootPart.CFrame = targetChar.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0)
+                        character.HumanoidRootPart.CFrame = targetChar.HumanoidRootPart.CFrame * CFrame.new(0, 0, -1)
                         DamageRemote:FireServer(gethumanoid(target))
 
                         wait(1) 
@@ -1880,10 +1869,44 @@ dashinf.TextScaled = true
 dashinf.TextSize = 1.000
 dashinf.TextWrapped = true
 dashinf.MouseButton1Down:Connect(function()
-	originalfunction = hookfunction(wait, function(seconds)
-		if seconds == 2 then return end
-		return originalfunction(seconds)
+	
+	local function fuckme()
+
+	local player = game.Players.LocalPlayer
+	local humanoid = player.Character:WaitForChild("Humanoid")
+	local huroot = player.Character:WaitForChild("HumanoidRootPart")
+	
+	local dashAnimation = Instance.new("Animation")
+	dashAnimation.AnimationId = "rbxassetid://6489881016"
+	
+	local function dash()
+		local anim = humanoid:LoadAnimation(dashAnimation)
+	   anim:Play()
+	
+		local bodyVelocity = Instance.new("BodyVelocity", huroot)
+		bodyVelocity.MaxForce = Vector3.new(20000, 0, 20000)
+		bodyVelocity.Velocity = humanoid.MoveDirection * Vector3.new(90, 0, 90)
+	
+		if humanoid.MoveDirection == Vector3.new(0, 0, 0) then
+			bodyVelocity.Velocity = huroot.CFrame.LookVector * Vector3.new(90, 0, 90)
+		end
+	
+		game:GetService("Debris"):AddItem(bodyVelocity, 0.2)
+	end
+	
+	game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+		if not gameProcessed and input.KeyCode == Enum.KeyCode.E then
+			dash()
+		end
 	end)
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    fuckme()
+end)
+
+
+
 end)
 
 closexd.Name = "closexd"
@@ -2481,6 +2504,8 @@ end
 coroutine.wrap(TIAQB_fake_script)()
 
 
+
+
 wait(0.5)
 
 
@@ -2681,5 +2706,3 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function()
 end)
 
 Bypass()
-
-
